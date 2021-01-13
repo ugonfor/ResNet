@@ -12,7 +12,7 @@ I write the code according to the following table.
 <img src="./Table1.jpg" alt="./Table1.jpg"/>
 
 ### 2-1. Test
-'''c
+```c
 Train Epoch: 56 | Batch Status: [0/50000] 	| Loss: 0.005 	| Acc: 100.000% (256/256)
 Train Epoch: 56 | Batch Status: [2560/50000] 	| Loss: 0.006 	| Acc: 99.396% (2799/2816)
 Train Epoch: 56 | Batch Status: [5120/50000] 	| Loss: 0.013 	| Acc: 99.182% (5332/5376)
@@ -36,7 +36,7 @@ Train Epoch: 56 | Batch Status: [48640/50000] 	| Loss: 0.003 	| Acc: 99.309% (48
 Training Time %d min %d sec 270 32
 top-1 error : 26.930% (2693/10000)
 top-5 error : 2.890% (289/10000)
-'''
+```
 
 
 #### reference
