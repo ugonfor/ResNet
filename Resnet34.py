@@ -119,7 +119,8 @@ batch_size = 256
 ## According to 3.4. Implementation ...
 model = ResNet34().to(device=device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001)
+#optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
 
 
@@ -151,43 +152,41 @@ def train(epoch):
 #https://gist.github.com/weiaicunzai/2a5ae6eac6712c70bde0630f3e76b77b
 def accuracy(output, target):
     """Computes the accuracy over the k top predictions for the specified values of k"""
-    with torch.no_grad():
-        batch_size = target.size(0)
+    batch_size = target.size(0)
 
-        _, pred = output.topk(5, 1, True, True)
-        pred = pred.t()
-        correct = pred.eq(target.view(1, -1).expand_as(pred))
-
-        correct_1 = correct[:1].view(-1).float().sum(0)
-        correct_5 = correct[:5].view(-1).float().sum(0)
-        res = [correct_1, correct_5]
-        return res
+    _, pred = output.topk(5, 1, True, True)
+    pred = pred.t()
+    correct = pred.eq(target.view(1, -1).expand_as(pred))
+    error1 = batch_size - correct[:1].reshape(-1).float().sum(0)
+    error5 = batch_size - correct[:5].reshape(-1).float().sum(0)
+    res = [error1, error5]
+    return res
 
 def test(epoch):
     model.eval()
     
-    correct_1_tot = 0
-    correct_5_tot = 0
+    error_1_tot = 0
+    error_5_tot = 0
     #don't need gradient calc
     with torch.no_grad():   
         for batch_idx, (data, target) in enumerate(testloader):
             data, target = data.to(device), target.to(device)
             output = model(data)
 
-            correct_k = accuracy(output, target)
-            correct_1_tot += correct_k[0]
-            correct_5_tot += correct_k[1]
+            error_k = accuracy(output, target)
+            error_1_tot += error_k[0]
+            error_5_tot += error_k[1]
     #print("Test Epoch : %d" % (epoch))
-    print("top-1 error : %.3f%% (%d/%d)" % (100.0 * correct_1_tot/len(testloader.dataset), correct_1_tot, len(testloader.dataset)))
-    print("top-5 error : %.3f%% (%d/%d)" % (100.0 * correct_5_tot/len(testloader.dataset), correct_5_tot, len(testloader.dataset)))
+    print("top-1 error : %.3f%% (%d/%d)" % (100.0 * error_1_tot/len(testloader.dataset), error_1_tot, len(testloader.dataset)))
+    print("top-5 error : %.3f%% (%d/%d)" % (100.0 * error_5_tot/len(testloader.dataset), error_5_tot, len(testloader.dataset)))
 
 if __name__ == "__main__":
     start = time.time()
-    for epoch in range(2):
+    for epoch in range(100):
         train(epoch)
-        print("Training Time %d min %d sec", int(time.time()-start)//60 , int(time.time()-start)%60)
+        print("Training Time %d min %d sec" % (int(time.time()-start)//60 , int(time.time()-start)%60))
         test(epoch)
-        print("Training Time %d min %d sec", int(time.time()-start)//60 , int(time.time()-start)%60)
+        print("Training Time %d min %d sec" % (int(time.time()-start)//60 , int(time.time()-start)%60))
     print("End at %d min %d sec")
         
         
